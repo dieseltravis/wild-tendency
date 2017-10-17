@@ -75,6 +75,7 @@ var addArtistText = function (img, txt, callback) {
       console.log(err);
       throw err;
     }
+    // TODO: add font background
     Jimp.loadFont(Jimp.FONT_SANS_16_WHITE).then(function (font) {
       image.cover(IMG_SIZE, IMG_SIZE)  // resize
          .print(font, PADDING, PADDING, txt, IMG_SIZE - (2 * PADDING))     // write text
@@ -88,7 +89,7 @@ var addArtistText = function (img, txt, callback) {
   });
 };
 
-var createGrid = function (imgs, callback) {
+var createGrid = function (imgs, response) {
   console.log("creating grid");
   var image = new Jimp(IMG_WIDTH_NUM * IMG_SIZE, IMG_HEIGHT_NUM * IMG_SIZE, function (gridErr, grid) {
     console.log("grid width:" + (IMG_WIDTH_NUM * IMG_SIZE) + " by height:" + (IMG_HEIGHT_NUM * IMG_SIZE));
@@ -143,7 +144,10 @@ var createGrid = function (imgs, callback) {
       });
       Promise.all(blits).then(function () {
         console.log("writing");
-        grid.quality(69).write(__dirname + "/tmp/hello.jpg");
+        grid.quality(69)
+            .write(__dirname + "/tmp/hello.jpg", function () {
+              response.sendFile(__dirname + '/tmp/hello.jpg');
+            });
       });
     });
     
@@ -233,8 +237,8 @@ app.post("/dreams", function postDream(request, response) {
 });
 
 app.get("/hello", function (request, response) {
-  createGrid(allImgs);
-  response.sendFile(__dirname + '/tmp/hello.jpg');
+  createGrid(allImgs, response);
+  //response.sendFile(__dirname + '/tmp/hello.jpg');
 });
 
 app.get("/hi", function (request, response) {
