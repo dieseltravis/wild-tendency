@@ -1,0 +1,29 @@
+{
+  "//1": "describes your app and its dependencies",
+  "//2": "https://docs.npmjs.com/files/package.json",
+  "//3": "updating this file will download and update your packages",
+  "name": "wild-tendency",
+  "version": "0.1.0",
+  "description": "last.fm image generator",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.16.2",
+    "jimp": "^0.2.28",
+    "bluebird": "^3.5.1"
+  },
+  "engines": {
+    "node": "8.x"
+  },
+  "repository": {
+    "url": "https://glitch.com/edit/#!/wild-tendency"
+  },
+  "license": "MIT",
+  "keywords": [
+    "glitch",
+    "jimp",
+    "lastfm"
+  ]
+}
