@@ -41,7 +41,7 @@ var imgData = [];
 
 const IMG_WIDTH_NUM = 4;
 const IMG_HEIGHT_NUM = 4;
-//const IMG_COUNT = IMG_WIDTH_NUM * IMG_HEIGHT_NUM;
+const IMG_COUNT = IMG_WIDTH_NUM * IMG_HEIGHT_NUM;
 const IMG_SIZE = 256;
 const PADDING = 10;
 
@@ -100,9 +100,21 @@ var addArtistText = function (img, txt, callback) {
   });
 };
 
+var del = function (f) {
+  fs.access(f, function(err) { 
+    if (err) {
+      console.log(err);
+    } else {
+      fs.unlink(f, function() {
+        console.info("deleted: ", f);
+      });
+    }
+  });
+};
+
 var createGrid = function (imgs, exresponse) {
   console.log("creating grid");
-  var gImg = new Jimp(IMG_WIDTH_NUM * IMG_SIZE, IMG_HEIGHT_NUM * IMG_SIZE, function (gridErr, grid) {
+  return new Jimp(IMG_WIDTH_NUM * IMG_SIZE, IMG_HEIGHT_NUM * IMG_SIZE, function (gridErr, grid) {
     console.log("grid width:" + (IMG_WIDTH_NUM * IMG_SIZE) + " by height:" + (IMG_HEIGHT_NUM * IMG_SIZE));
     if (gridErr) {
       console.info("new grid error", gridErr);
@@ -140,6 +152,11 @@ var createGrid = function (imgs, exresponse) {
               //exresponse.sendFile(__dirname + '/tmp/hello.jpg');
               exresponse.send("hello.jpg");
               //exresponse.sendStatus(200);
+              console.log("deleting tmp imgs...");
+              for(let x = IMG_COUNT; x--;) {
+                del(__dirname + "/tmp/img" + x + ".png");
+                del(__dirname + "/tmp/img" + x + ".png.txt.png");
+              }
             });
       });
     });
@@ -201,7 +218,7 @@ var last = function (username, exresponse) {
             artImgFuncs.push(new Promise (function (resolve) {
               getArtistImg(imgSrc, destName, function savedCallback () {
                 return addArtistText(artistImgSrc, name, resolve);
-              })
+              });
             }));
 
             allImgs[i] = __dirname + "/tmp/img" + i + ".png.txt.png";
