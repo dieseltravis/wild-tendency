@@ -1,7 +1,6 @@
 // server.js
 // where your node app starts
 
-//const Promise = require('bluebird');
 const Jimp = require("jimp");
 const fs = require('fs');
 const https = require("https");
@@ -201,20 +200,6 @@ var last = function (username, exresponse) {
               img: imgSrc
             });
             
-            //artImgFuncs.push(function () {
-            //  return getArtistImg(imgSrc, destName, function savedCallback () {
-            //    return addArtistText(artistImgSrc, name);
-            //  });
-            //});
-            
-            //artImgFuncs.push(getArtistImg(imgSrc, destName, function savedCallback () {
-            //  return addArtistText(artistImgSrc, name);
-            //}));
-            
-            //getArtistImg(imgSrc, destName, function savedCallback () {
-            //  return addArtistText(artistImgSrc, name);
-            //});
-
             artImgFuncs.push(new Promise (function (resolve) {
               getArtistImg(imgSrc, destName, function savedCallback () {
                 return addArtistText(artistImgSrc, name, resolve);
