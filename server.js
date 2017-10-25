@@ -1,5 +1,6 @@
 // server.js
 // where your node app starts
+//TODO: massive refactoring, this code is a goddamn mess
 
 const Jimp = require("jimp");
 const fs = require('fs');
@@ -62,6 +63,19 @@ var getArtistImg = function (imgUrl, fileName, callback) {
           return callback();
         });
       });
+    });
+  } else {
+    var replacement = new Jimp(IMG_SIZE, IMG_SIZE, function (newErr, newImg) {
+      console.log("image not found, making a new one");
+      if (newErr) {
+        console.info("new img error", newErr);
+        throw newErr;
+      }
+      newImg.write(__dirname + "/tmp/" + fileName, function(err) {
+          if (err) throw err;
+          console.log("File saved: " + "/tmp/" + fileName);
+          return callback();
+        });
     });
   }
 };
@@ -148,9 +162,8 @@ var createGrid = function (imgs, exresponse) {
         console.log("writing hello file");
         grid.quality(85)
             .write(__dirname + "/tmp/hello.jpg", function () {
-              //exresponse.sendFile(__dirname + '/tmp/hello.jpg');
               exresponse.send("hello.jpg");
-              //exresponse.sendStatus(200);
+          
               console.log("deleting tmp imgs...");
               for(let x = IMG_COUNT; x--;) {
                 del(__dirname + "/tmp/img" + x + ".png");
@@ -221,21 +234,21 @@ var last = function (username, exresponse) {
           //exresponse.sendStatus(200);
         } else {
           console.info("data error: ", data);
+          exresponse.sendStatus(500);
           exresponse.send(data);
-          //exresponse.sendStatus(500);
         }
       } else {
         console.info("json error: ", output);
+        exresponse.sendStatus(500);
         exresponse.send(output);
-        //exresponse.sendStatus(500);
       }      
     });
   });
 
   req.on('error', function onError(err) {
     console.error(err);
+    exresponse.sendStatus(500);
     exresponse.send(err);
-    //exresponse.sendStatus(500);
   });
 
   req.end();
