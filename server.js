@@ -125,7 +125,7 @@ var del = function (f) {
   });
 };
 
-var createGrid = function (imgs, exresponse) {
+var createGrid = function (imgs, exresponse, username) {
   console.log("creating grid");
   return new Jimp(IMG_WIDTH_NUM * IMG_SIZE, IMG_HEIGHT_NUM * IMG_SIZE, function (gridErr, grid) {
     console.log("grid width:" + (IMG_WIDTH_NUM * IMG_SIZE) + " by height:" + (IMG_HEIGHT_NUM * IMG_SIZE));
@@ -161,7 +161,7 @@ var createGrid = function (imgs, exresponse) {
       Promise.all(blits).then(function () {
         console.log("writing hello file");
         grid.quality(85)
-            .write(__dirname + "/tmp/hello.jpg", function () {
+            .write(__dirname + "/tmp/hello." + username + ".jpg", function () {
               exresponse.send("hello.jpg");
           
               console.log("deleting tmp imgs...");
@@ -228,7 +228,7 @@ var last = function (username, exresponse) {
           
           Promise.all(artImgFuncs).then(function () {
             console.log("creating grid for " + username);
-            createGrid(allImgs, exresponse);
+            createGrid(allImgs, exresponse, username);
           });
           
           //exresponse.sendStatus(200);
@@ -254,6 +254,15 @@ var last = function (username, exresponse) {
   req.end();
 };
 
+var sanitizeUser = function (dirtyUser) {
+  let cleanUser = "";
+  if (dirtyUser) {
+    cleanUser = dirtyUser.replace(/\W+/,"_");
+  }
+
+  return cleanUser;
+};
+
 
 // Express app: 
 // http://expressjs.com/en/starter/static-files.html
@@ -270,13 +279,24 @@ app.get("/dreams", function getDreams(request, response) {
 
 // could also use the POST body instead of query string: http://expressjs.com/en/api.html#req.body
 app.post("/dreams", function postDream(request, response) {
-  last(request.query.dream, response);
+  let lastfmuser = "";
+  if (request && request.query && request.query.dream) {
+    lastfmuser = sanitizeUser(request.query.dream);
+    console.info("setting img for: ", lastfmuser);
+  }
+  last(lastfmuser, response);
 });
 
 // debugging routes
 app.get("/hello", function (request, response) {
   //createGrid(allImgs, response);
-  response.sendFile(__dirname + '/tmp/hello.jpg');
+  let lastfmuser = "";
+  if (request && request.query && request.query.l) {
+    lastfmuser = sanitizeUser(request.query.l);
+    console.info("getting img for: ", lastfmuser);
+  }
+  
+  response.sendFile(__dirname + "/tmp/hello." + lastfmuser + ".jpg");
 });
 
 app.get("/hi", function (request, response) {
