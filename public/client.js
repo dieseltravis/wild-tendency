@@ -9,8 +9,10 @@ $(function() {
     $hello.html("<blink>loading...</blink>");
     
     $.post("/dreams?" + $.param({ dream: dream }), function postDream () {
-      $hello.html("<img src='/hello?" + Math.random() + ".jpg' />");
+      var helloImgUrl = "/hello?l=" + dream + "&r=" + Math.random() + ".jpg";
+      $hello.html("<a href='" + helloImgUrl + "'><img src='" + helloImgUrl + "' /></a>");
     }).fail(function(err) {
+      $hello.html("uh oh, something broke, check the console...");
       console.info("error: ", err);
     }).always(function() {
       console.log("finished.");
